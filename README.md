@@ -27,35 +27,48 @@ docker build -t ai_support_app .
 ```bash
 docker volume create ai_support_db
 ```
-This will start the Django development server inside the container, accessible at http://127.0.0.1:8000.
+This ensures that your SQLite database is stored outside the container, so your data is not lost when the container stops.
 
-4. Applying Migrations
-If needed, you can apply migrations inside the container:
+4. Run the docker container with volume
+
 ```bash
-docker exec -it <container_id> python manage.py migrate
+docker run -p 8000:8000 -v ai_support_db:/app/db.sqlite3 ai_support_app
 ```
-5. Creating a Superuser
-To create a Django admin superuser inside the container:
+-p 8000:8000 maps the container port to your local machine.
+-v ai_support_db:/app/db.sqlite3 mounts the database file to persist data.
+
+5. Apply Migrations( first time only)
+Open a terminal into the running container:
 ```bash
-docker exec -it <container_id> python manage.py createsuperuser
+docker exec -it <container_id> bash
 ```
+
+6. Inside the container, run:
+```bash
+python manage.py migrate
+```
+
+7. Access the App
+Visit in your browser: http://127.0.0.1:8000
+
+8. Stop the Container
+```bash
+docker stop <container_id>
+```
+Your data remains safe because of the Docker volume.
 
 
 ### Assumptions
 
-1. User Roles: Customers and Admins are clearly separated; admin accounts are created in Django admin.
-2. AI Responses: Google Gemini AI is used to generate responses; accuracy depends on the AI model.
-3. Security: CSRF protection and user authentication are enforced.
-4. Environment Variables: Gemini API key must be exported locally before running the server.
-5. No Real-time Notifications: The system is not integrated with SMS/email alerts for ticket updates.
+1. The app uses SQLite database inside the container by default.
+2. The AI response feature requires a valid API key (e.g., Gemini API or OpenAI).
+3. Users (admin or customers) can be created through the app interface.
 
 ### Limitations
 
-1. Single Machine Testing: The system is tested locally; production deployment may require Docker, a web server, and proper environment variable management.
-2. AI Reliability: AI responses might occasionally require manual correction.
-3. No Multi-language Support: Currently supports only English.
-4. Basic UI/UX: Focus is on functionality rather than advanced design.
-5. Admin Panel Role Check: Admin cannot act as customer, but the interface is basic and could be enhanced with detailed role validation messages.
+1. This setup is meant for development/testing purposes.
+2. For production, use a production-ready WSGI server (like Gunicorn) and a more robust database (like PostgreSQL).
+3. The AI API key should be set in environment variables or a .env file inside the container for security.
 
 ### Tech Stack
 
@@ -65,16 +78,6 @@ docker exec -it <container_id> python manage.py createsuperuser
 4. Basic UI/UX: Focus is on functionality rather than advanced design.
 5. Admin Panel Role Check: Admin cannot act as customer, but the interface is basic and could be enhanced with detailed role validation messages.
 
-### How to use
-
-1. Register as a new customer or log in as an existing one.
-2. Customers can create tickets with messages describing their issues.
-3. Admins can:
-    a. View all tickets.
-    b. Manually respond to tickets
-    c. Auto-generate responses via AI
-    d. Re-generate AI responses if needed
-4. Customers can view replies and ticket status.
 
 ### Contact/Support
 This project is maintained by Aahana Bobade. For any issues or questions regarding setup or usage, please contact via GitHub or email(aahanabobade@gmail.com).
