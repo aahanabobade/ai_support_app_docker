@@ -17,22 +17,31 @@ from django.contrib.auth.models import User
 gemini_api_key = genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+
 def customer_register(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.method == "POST":
+        username = request.POST['username']
+        email = request.POST.get('email', '')
+        password = request.POST['password']
+        password2 = request.POST['password2']
+
+        if password != password2:
+            messages.error(request, "Passwords do not match!")
+            return render(request, 'tickets/customer_register.html')
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-        else:
-            user = User.objects.create_user(username=username, password=password)
-            user.is_staff = False  # ensure it's a customer, not admin
-            user.save()
-            messages.success(request, "Registration successful! You can now login.")
-            return redirect('login')  # <-- redirect to the existing login page
+            messages.error(request, "Username already exists!")
+            return render(request, 'tickets/customer_register.html')
 
-    return render(request, 'tickets/customer_register.html', {})
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.save()
+        messages.success(request, "Registration successful! Please login.")
+        return redirect('login')
 
+    return render(request, 'tickets/customer_register.html')
 
 # -------------------
 # Login / Logout
