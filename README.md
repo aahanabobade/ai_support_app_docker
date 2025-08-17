@@ -71,6 +71,12 @@ Your data remains safe because of the Docker volume.
 3. The AI API key should be set in environment variables or a .env file inside the container for security.
 
 ### Tech Stack
+1. Python 3.13, Django 5.2
+2. Docker for containerization
+3. SQLite database
+4. Gemini API for AI integration for auto-generated responses
+
+### Note:
 
 1. Single Machine Testing: The system is tested locally; production deployment may require Docker, a web server, and proper environment variable management.
 2. AI Reliability: AI responses might occasionally require manual correction.
