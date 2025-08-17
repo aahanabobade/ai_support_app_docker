@@ -1,61 +1,45 @@
-### AI-Powered Customer Support Interface
+### AI-Powered Customer Support Interface (Dockerized)
 ---
-EduvanceAI is a simple AI-powered customer support interface that allows support agents to view customer queries, respond manually, or auto-generate AI-powered responses. It provides role-based login for customers and admins, ticket creation and tracking, and AI-assisted classification and response.
+This repository contains the Dockerized version of the AI-powered customer support interface. It allows running the Django application inside a container for easier deployment and environment management.
 
 ---
 ### Features 
-1. Role-based Login: Separate login for Customers and Admins.
-2. Customer Tickets: Customers can create new tickets and view ticket history.
-3. Admin Panel: Admins can view all tickets, reply manually, or generate AI responses.
-4. AI-Powered Ticket Classification: Automatically classifies tickets into Billing, Technical, or General.
-5. AI-Powered Responses: Admins can auto-generate professional responses using Google Gemini AI.
-6. Re-generate Responses: Admins can regenerate AI responses if the first response isn’t satisfactory.
-7. Registration: New customers can register directly via a simple registration form.
-8. Security: Role validation prevents admins from logging in as customers or vice versa. CSRF protection and authentication are included.
+1. Run the Django app in a Docker container.
+2. Preconfigured dependencies via requirements.txt.
+3. Easy setup without installing Python or other libraries locally.
+4. Supports existing database migrations and superuser creation.
+---
+### Prerequisites
+Docker installed on your system.
+
 ---
 ### Setup Instruction
 1. Clone the Repository
 ```bash
-git clone https://github.com/aahanabobade/ai_support_app.git
-cd ai_support_app
+git clone https://github.com/aahanabobade/ai_support_app_docker.git
+cd ai_support_app_docker
 ```
-2. Create and Activate Virtual Environment
+2. Build the Docker Image
 ```bash
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+docker build -t ai_support_app .
+```
+3. Create a Docker Volume for Database Persistence
+```bash
+docker volume create ai_support_db
+```
+This will start the Django development server inside the container, accessible at http://127.0.0.1:8000.
 
-# Windows
-python -m venv venv
-venv\Scripts\activate
-```
-3. Install Dependencies
+4. Applying Migrations
+If needed, you can apply migrations inside the container:
 ```bash
-pip install -r requirements.txt
+docker exec -it <container_id> python manage.py migrate
 ```
-If requirements.txt does not exist, generate it using:
+5. Creating a Superuser
+To create a Django admin superuser inside the container:
 ```bash
-pip freeze > requirements.txt
-```
-4. Set Gemini API Key
-```bash
-# macOS/Linux
-export GEMINI_API_KEY='your_gemini_api_key_here'
-
-# Windows (PowerShell)
-setx GEMINI_API_KEY "your_gemini_api_key_here"
-```
-5. Run Database Management system
-```bash
-python manage.py makemigrations
-python manage.py migrate
+docker exec -it <container_id> python manage.py createsuperuser
 ```
 
-6. Run the server
-```bash
-python manage.py runserver
-```
-Open your browser and visit: http://127.0.0.1:8000/
 
 ### Assumptions
 
