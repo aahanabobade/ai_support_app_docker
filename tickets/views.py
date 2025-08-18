@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect #Used to return HTML pages and redirect after actions
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib import messages
-from .models import Ticket
+from django.contrib.auth.decorators import login_required #Ensures only logged-in users can access a view.
+from django.contrib.admin.views.decorators import staff_member_required #Ensures only admin/staff users can access certain views
+from django.contrib import messages #Django’s way to show success or error messages to the user
+from .models import Ticket #Your ticket model and form for creating tickets
 from .forms import TicketForm
-from django.http import JsonResponse
+from django.http import JsonResponse #Sends JSON data back (used for AI responses)
 import os
 import requests  # to make API calls
 import google.generativeai as genai
@@ -21,6 +21,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
+"""
+Handles customer registration. Processes POST requests to create a new user after validating 
+password match and username uniqueness. On successful registration, redirects to login page; 
+for GET requests, renders the registration form.
+"""
 def customer_register(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -43,11 +48,13 @@ def customer_register(request):
 
     return render(request, 'tickets/customer_register.html')
 
-# -------------------
+
 # Login / Logout
-# -------------------
+# Handles the login process for both customers and admins, checking credentials and redirecting based on role.
 def user_login(request):
-    role = request.GET.get('role')  # <-- get role from URL query parameter
+    #If the URL has a role parameter (like ?role=admin), it captures it
+    role = request.GET.get('role')  #  get role from URL query parameter 
+    
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -69,24 +76,27 @@ def user_login(request):
 
         else:
             messages.error(request, 'Invalid username or password.')
+            
+    #render(request, 'tickets/login.html', {'role': role}) -> loads the login template with role info.
 
-    return render(request, 'tickets/login.html', {'role': role})
+    return render(request, 'tickets/login.html', {'role': role}) #
 
 @login_required
 def user_logout(request):
     logout(request)
     return redirect('home')
 
-# -------------------
+
 # Home page
-# -------------------
+# Displays the homepage of the support system
 def home(request):
     # Home page just shows links to Customer or Admin login
     return render(request, 'tickets/home.html')
 
-# -------------------
 # Customer Views
-# -------------------
+#This function handles ticket creation, runs AI classification, and stores it in the database.
+
+# The function is decorated with @login_required, so only logged-in users can access it.
 @login_required
 def create_ticket(request):
     if request.method == 'POST':
@@ -97,9 +107,9 @@ def create_ticket(request):
             ticket.ai_generated = False  # new tickets are not AI responses
             ticket.ai_classified = True
 
-            # -------------------------
+            
             # AI-powered ticket classification (strict prompt)
-            # -------------------------
+            
             try:
                 model = genai.GenerativeModel("gemini-1.5-flash")
                 prompt = (
@@ -132,15 +142,19 @@ def create_ticket(request):
 
 @login_required
 def customer_ticket_list(request):
+    #filter(customer=request.user) ensures only the tickets of the current user are fetched.
+    #order_by('-created_at') sorts tickets in descending order (newest first)
     tickets = Ticket.objects.filter(customer=request.user).order_by('-created_at')
     return render(request, 'tickets/customer_ticket_list.html', {'tickets': tickets})
 
-# -------------------
+
 # Admin Views
-# -------------------
+
 @staff_member_required
 def admin_ticket_list(request):
+    #Fetches all tickets from the database and orders them by creation time (newest first)
     tickets = Ticket.objects.all().order_by('-created_at')
+    #Passes these tickets to a template for display
     return render(request, 'tickets/admin_ticket_list.html', {'tickets': tickets})
 
 @staff_member_required
@@ -166,7 +180,7 @@ def generate_ai_response(request, ticket_id):
     ticket = Ticket.objects.get(id=ticket_id)
     
     prompt = (
-        f"You are a customer support agent at EduvanceAI. "
+        f"You are a customer support agent at AahanaAI. "
         f"Write a professional, polite, and clear response to the customer ticket below. "
         f"Do not use stars or markdown formatting. "
         f"Use proper paragraphs, numbering if needed, and maintain a formal tone.\n\n"

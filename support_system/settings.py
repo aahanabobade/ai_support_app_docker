@@ -10,15 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
+from pathlib import Path #Uses pathlib for file paths
+from dotenv import load_dotenv #Loads environment variables from a .env file
 import os
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") #GEMINI_API_KEY is your AI API key loaded securely, not hardcoded.
 
+#BASE_DIR points to the root folder of your project. 
+# #Used to construct paths for database, static files, templates, etc.
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent 
 
 
 
@@ -36,6 +38,9 @@ CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
 
 
 # Application definition
+#Default Django apps: admin panel, authentication, sessions, messages, static files.
+#Custom app: tickets (where your support system lives).
+#widget_tweaks: Helper library to modify forms in templates.
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -48,6 +53,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
 ]
 
+#Middleware runs on every request/response.
+#Handles security, sessions, authentication, messages, CSRF protection, etc.
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,9 +67,10 @@ MIDDLEWARE = [
 ]
 
 
-
+# Points to urls.py in support_system which routes requests.
 ROOT_URLCONF = 'support_system.urls'
 
+#Configures where Django looks for HTML templates and context processors.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -77,7 +85,7 @@ TEMPLATES = [
         },
     },
 ]
-
+#WSGI is the entry point for the app on servers.
 WSGI_APPLICATION = 'support_system.wsgi.application'
 
 
@@ -94,7 +102,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+#Checks for password strength when creating users.
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -126,6 +134,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+#URL path for static assets in templates
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 

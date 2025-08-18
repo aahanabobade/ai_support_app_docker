@@ -14,9 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from tickets import views
+from django.contrib import admin #Enables Django admin panel
+from django.urls import path, include #Used to define URL patterns #include: Lets you include URL patterns from other apps.
+from tickets import views #So you can map URLs to your app’s view functions
 
 urlpatterns = [
     path('admin/', admin.site.urls),

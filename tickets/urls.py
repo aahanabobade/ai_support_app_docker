@@ -1,8 +1,12 @@
+#Defines URL patterns specific to the tickets app and maps them to corresponding view functions
+
+
 from django.urls import path
 from . import views
-
 urlpatterns = [
+    #Root of the tickets app; shows the home page with login options.
     path('', views.home, name='home'),
+    #Login page for both customers and admin
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('register/customer/', views.customer_register, name='customer_register'),
@@ -15,3 +19,5 @@ urlpatterns = [
     path('ticket/<int:ticket_id>/', views.customer_ticket_detail, name='customer_ticket_detail'),
 
 ]
+
+#Each URL connects a web address to a view function, enabling navigation and interaction with the ticket system

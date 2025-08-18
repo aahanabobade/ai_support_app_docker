@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}EduvanceAI Support System{% endblock %}</title>
+  <title>{% block title %}AahanaAI Support System{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap CSS -->
@@ -79,6 +79,11 @@
 
           {% if not user.is_staff %}
             <!-- Customer links -->
+             <!--If logged in: shows username and role-based options:
+	                Customers → Create Ticket, My Tickets
+                	Admins → Admin Dashboard
+                	Always shows Logout button.
+                	If not logged in: shows two login buttons (Customer/Admin).-->
             <a href="{% url 'create_ticket' %}" class="btn btn-warning btn-lg">Create Ticket</a>
             <a href="{% url 'customer_ticket_list' %}" class="btn btn-warning btn-lg">My Tickets</a>
           {% else %}
@@ -95,6 +100,7 @@
     </div>
   </nav>
 
+<!--This is the placeholder where child templates inject their page content.-->
   <main class="container py-4">
     {% block content %}{% endblock %}
   </main>
